@@ -91,9 +91,10 @@
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.2rem; /* 少しフォントを小さく */
             text-align: center;
             padding: 1rem;
+            white-space: pre-wrap; /* 改行を有効にする */
         }
     </style>
 </head>
@@ -157,10 +158,7 @@
 
     <script>
         // --- LIFF & GAS 設定 ---
-        // LIFF IDを反映しました
         const LIFF_ID = "2007667389-zrkMpOk3"; 
-        
-        // GASのデプロイURLを反映しました
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZr8t5h-G4oBpVVpbqB-xkb79ny5y8TaaIftMJffbQpYA1QWYDuOQE3byYyFZRx1xg/exec";
 
         // --- ゲーム設定 ---
@@ -185,23 +183,31 @@
 
         // --- LIFF初期化 ---
         async function initializeLiff() {
-            // LIFF IDが設定されているかチェック
-            if (LIFF_ID === "YOUR_LIFF_ID" || !LIFF_ID) {
+            loadingScreen.textContent = "LIFFの準備をしています...";
+            
+            if (!LIFF_ID) {
                 loadingScreen.textContent = "エラー: LIFF IDが設定されていません。";
-                return; // 処理を中断
+                return;
             }
             
             try {
+                loadingScreen.textContent = "LIFFサーバーに接続中...";
                 await liff.init({ liffId: LIFF_ID });
+                
+                loadingScreen.textContent = "ログイン状態を確認中...";
                 if (!liff.isLoggedIn()) {
-                    liff.login();
+                    loadingScreen.textContent = "ログイン画面に移動します...";
+                    liff.login(); // ログインしていなければ、ログイン画面にリダイレクト
                 } else {
+                    loadingScreen.textContent = "ゲームを読み込んでいます...";
+                    // ログイン済みの場合、ゲームを表示
                     loadingScreen.classList.add('hidden');
                     mainContent.classList.remove('hidden');
                 }
             } catch (err) {
                  console.error(err);
-                 loadingScreen.textContent = "LIFFの初期化に失敗しました。LIFF IDが正しいか、LINE Developersコンソールで設定を確認してください。";
+                 // エラーオブジェクトを文字列に変換して表示
+                 loadingScreen.textContent = `LIFFの初期化に失敗しました。\n\n【考えられる原因】\n・エンドポイントURLが正しく設定されていない\n・LIFF IDが間違っている\n\nエラー内容:\n${JSON.stringify(err)}`;
             }
         }
 
