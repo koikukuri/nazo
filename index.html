@@ -92,6 +92,8 @@
             justify-content: center;
             color: white;
             font-size: 1.5rem;
+            text-align: center;
+            padding: 1rem;
         }
     </style>
 </head>
@@ -155,13 +157,14 @@
 
     <script>
         // --- LIFF & GAS 設定 ---
-        // ※後でLINE Developersで取得した値に書き換えてください
-        const LIFF_ID = "YOUR_LIFF_ID"; 
+        // LIFF IDを反映しました
+        const LIFF_ID = "2007667389-zrkMpOk3"; 
+        
         // GASのデプロイURLを反映しました
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZr8t5h-G4oBpVVpbqB-xkb79ny5y8TaaIftMJffbQpYA1QWYDuOQE3byYyFZRx1xg/exec";
 
         // --- ゲーム設定 ---
-        const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '�', '🦴', '🎆', '🥝', '🐷'];
+        const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
         const correctAnswer = ['🚥', '🍜', '🐷'];
         const handEmojis = ['✊', '✌️', '✋'];
 
@@ -182,19 +185,27 @@
 
         // --- LIFF初期化 ---
         async function initializeLiff() {
-            await liff.init({ liffId: LIFF_ID });
-            if (!liff.isLoggedIn()) {
-                liff.login();
-            } else {
-                loadingScreen.classList.add('hidden');
-                mainContent.classList.remove('hidden');
+            // LIFF IDが設定されているかチェック
+            if (LIFF_ID === "YOUR_LIFF_ID" || !LIFF_ID) {
+                loadingScreen.textContent = "エラー: LIFF IDが設定されていません。";
+                return; // 処理を中断
+            }
+            
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    loadingScreen.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                }
+            } catch (err) {
+                 console.error(err);
+                 loadingScreen.textContent = "LIFFの初期化に失敗しました。LIFF IDが正しいか、LINE Developersコンソールで設定を確認してください。";
             }
         }
 
-        initializeLiff().catch(err => {
-            console.error(err);
-            loadingScreen.textContent = "LIFFの初期化に失敗しました";
-        });
+        initializeLiff();
         
         // --- スピナーのロジック ---
         spinnerWidgets.forEach((widget, index) => {
@@ -334,4 +345,3 @@
     </script>
 </body>
 </html>
-�
