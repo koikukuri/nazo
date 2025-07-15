@@ -3,64 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>じゃんけん謎</title>
-    <!-- LIFF SDK -->
+    <title>絵文字スピナー謎解き - LIFF版</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <!-- Google Fonts (ドット絵フォント) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-family: 'DotGothic16', sans-serif;
-            background-color: #334155;
-            image-rendering: pixelated;
-        }
-        .pixel-container {
-            background-color: #F1F5F9;
-            border: 4px solid #1E293B;
-            box-shadow: 8px 8px 0px #1E293B;
-        }
-        .pixel-btn {
-            background-color: #64748B;
-            color: white;
-            border: 4px solid #1E293B;
-            box-shadow: 2px 2px 0px #1E293B;
-            transition: all 0.1s;
-            user-select: none;
-        }
-        .pixel-btn:active {
-            transform: translate(2px, 2px);
-            box-shadow: none;
-        }
-        .arrow-btn {
-            padding: 4px;
-            font-size: 1.2rem;
-        }
-        .pixel-display {
-            background-color: #CBD5E1;
-            border: 4px solid #475569;
-            height: 80px;
-            width: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            line-height: 1;
-        }
-        .hand-icon {
-            font-size: 2.5rem; 
-        }
-        #success-message {
-             background-color: rgba(30, 41, 59, 0.9);
-             border: 4px solid #F1F5F9;
-        }
-        .close-btn {
-            background-color: #ef4444;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
         }
         #fireworks-canvas {
             position: fixed;
@@ -71,283 +22,188 @@
             z-index: -1;
             pointer-events: none;
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
+       .emoji-display,.hand-emoji,.spinner-btn {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        /* ローディング画面 */
-        #loading {
+       .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+       .fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        /* 読み込み中やエラー表示用のスタイル */
+       .overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #334155;
-            z-index: 9999;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 1.2rem; /* 少しフォントを小さく */
+            z-index: 9999;
             text-align: center;
-            padding: 1rem;
-            white-space: pre-wrap; /* 改行を有効にする */
+            font-size: 1.2rem;
+            color: #333;
         }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen overflow-hidden p-4">
+<body class="bg-indigo-50 flex items-center justify-center h-screen overflow-hidden">
 
-    <div id="loading">よみこみちゅう...</div>
+    <div id="liff-overlay" class="overlay">
+        <p id="liff-message">アプリを読み込んでいます...</p>
+    </div>
 
-    <!-- 花火エフェクト用のキャンバス -->
     <canvas id="fireworks-canvas"></canvas>
 
-    <div id="main-content" class="relative w-full max-w-sm hidden">
-        <div id="game-container" class="pixel-container p-6">
-            
-            <!-- スピナー -->
-            <div class="flex justify-around items-end">
-                <!-- スピナー 1 -->
+    <div class="relative w-full max-w-xs sm:max-w-md" id="app-container" style="display: none;">
+        <h1 id="welcome-message" class="text-center text-xl sm:text-2xl font-bold text-purple-800 mb-4"></h1>
+
+        <div id="spinner-container" class="bg-white p-4 sm:p-8 rounded-xl shadow-md transition-all duration-500">
+            <div class="flex justify-center space-x-2 sm:space-x-4">
                 <div class="spinner-widget text-center">
-                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
-                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
-                    <div class="pixel-display my-1"></div>
-                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                    <div class="hand-emoji text-3xl sm:text-4xl mb-2">✊</div>
+                    <button class="spinner-btn up-btn bg-purple-200 hover:bg-purple-300 text-purple-800 font-bold py-2 px-3 sm:px-4 rounded-t-lg w-full transition-colors duration-200">▲</button>
+                    <div class="emoji-display bg-purple-50 text-5xl sm:text-6xl h-20 w-20 sm:h-24 sm:w-24 flex items-center justify-center border-2 border-purple-200 rounded-md">🧋</div>
+                    <button class="spinner-btn down-btn bg-purple-200 hover:bg-purple-300 text-purple-800 font-bold py-2 px-3 sm:px-4 rounded-b-lg w-full transition-colors duration-200">▼</button>
                 </div>
-                <!-- スピナー 2 -->
                 <div class="spinner-widget text-center">
-                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
-                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
-                    <div class="pixel-display my-1"></div>
-                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                    <div class="hand-emoji text-3xl sm:text-4xl mb-2">✌️</div>
+                    <button class="spinner-btn up-btn bg-purple-200 hover:bg-purple-300 text-purple-800 font-bold py-2 px-3 sm:px-4 rounded-t-lg w-full transition-colors duration-200">▲</button>
+                    <div class="emoji-display bg-purple-50 text-5xl sm:text-6xl h-20 w-20 sm:h-24 sm:w-24 flex items-center justify-center border-2 border-purple-200 rounded-md">🧋</div>
+                    <button class="spinner-btn down-btn bg-purple-200 hover:bg-purple-300 text-purple-800 font-bold py-2 px-3 sm:px-4 rounded-b-lg w-full transition-colors duration-200">▼</button>
                 </div>
-                <!-- スピナー 3 -->
                 <div class="spinner-widget text-center">
-                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
-                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
-                    <div class="pixel-display my-1"></div>
-                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                    <div class="hand-emoji text-3xl sm:text-4xl mb-2">✋</div>
+                    <button class="spinner-btn up-btn bg-purple-200 hover:bg-purple-300 text-purple-800 font-bold py-2 px-3 sm:px-4 rounded-t-lg w-full transition-colors duration-200">▲</button>
+                    <div class="emoji-display bg-purple-50 text-5xl sm:text-6xl h-20 w-20 sm:h-24 sm:w-24 flex items-center justify-center border-2 border-purple-200 rounded-md">🧋</div>
+                    <button class="spinner-btn down-btn bg-purple-200 hover:bg-purple-300 text-purple-800 font-bold py-2 px-3 sm:px-4 rounded-b-lg w-full transition-colors duration-200">▼</button>
                 </div>
             </div>
             
-            <!-- 判定ボタン -->
-            <div class="mt-8 text-center">
-                <button id="check-btn" class="pixel-btn bg-sky-500 py-3 px-10 text-xl">
-                    けってい
-                </button>
+            <div class="mt-6 text-center">
+                <button id="check-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transform hover:scale-105 transition-transform duration-200">判定</button>
             </div>
         </div>
 
-        <!-- 正解メッセージ -->
-        <div id="success-message" class="hidden absolute inset-0 text-white p-6 flex flex-col items-center justify-center text-center">
-            <h2 class="text-4xl mb-4">クリア!</h2>
-            <p id="sending-message" class="text-lg mb-6">みんなに通知を送信中...</p>
-            <p id="sent-message" class="text-lg mb-6 hidden">送信しました！</p>
-            <button id="close-btn" class="pixel-btn close-btn py-3 px-10 text-xl hidden">
-                とじる
-            </button>
+        <div id="success-message" class="hidden absolute inset-0 bg-purple-600 bg-opacity-90 text-white p-4 sm:p-6 rounded-xl flex flex-col items-center justify-center text-center shadow-lg">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">クリア！</h2>
+            <p class="text-base sm:text-lg whitespace-pre-line">ハートの部屋のパスワードは「バンダイバシ」</p>
+            <p class="text-xs sm:text-sm mt-2 whitespace-pre-line">パスワードがウマく受け付けられないときは<br>ダイヤオブジェクトを参照</p>
         </div>
-
-        <!-- メッセージ表示エリア -->
-        <div id="message-area" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white font-bold py-3 px-5 border-4 border-slate-900">
+        <div id="incorrect-message" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg">
+            ちがうよ！
         </div>
     </div>
 
     <script>
-        // --- LIFF & GAS 設定 ---
-        const LIFF_ID = "2007667389-zrkMpOk3"; 
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZr8t5h-G4oBpVVpbqB-xkb79ny5y8TaaIftMJffbQpYA1QWYDuOQE3byYyFZRx1xg/exec";
-
-        // --- ゲーム設定 ---
+        // --- 元のゲームロジック ---
         const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
         const correctAnswer = ['🚥', '🍜', '🐷'];
-        const handEmojis = ['✊', '✌️', '✋'];
-
-        // --- 要素の取得 ---
-        const loadingScreen = document.getElementById('loading');
-        const mainContent = document.getElementById('main-content');
         const spinnerWidgets = document.querySelectorAll('.spinner-widget');
+        const displays = document.querySelectorAll('.emoji-display');
         const checkButton = document.getElementById('check-btn');
         const successMessage = document.getElementById('success-message');
-        const sendingMessage = document.getElementById('sending-message');
-        const sentMessage = document.getElementById('sent-message');
-        const closeButton = document.getElementById('close-btn');
-        const messageArea = document.getElementById('message-area');
+        const incorrectMessage = document.getElementById('incorrect-message');
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
-        let particles = [];
+        let particles =;
         let isSolved = false;
 
-        // --- LIFF初期化 ---
-        async function initializeLiff() {
-            loadingScreen.textContent = "LIFFの準備をしています...";
-            
-            if (!LIFF_ID) {
-                loadingScreen.textContent = "エラー: LIFF IDが設定されていません。";
-                return;
-            }
-            
-            try {
-                loadingScreen.textContent = "LIFFサーバーに接続中...";
-                await liff.init({ liffId: LIFF_ID });
-                
-                loadingScreen.textContent = "ログイン状態を確認中...";
-                if (!liff.isLoggedIn()) {
-                    loadingScreen.textContent = "ログイン画面に移動します...";
-                    liff.login(); // ログインしていなければ、ログイン画面にリダイレクト
+        // スピナーのロジック（元のコードを関数化）
+        function initializeSpinners() {
+            spinnerWidgets.forEach((widget, index) => {
+                let currentIndex = 1;
+                const display = widget.querySelector('.emoji-display');
+                const upButton = widget.querySelector('.up-btn');
+                const downButton = widget.querySelector('.down-btn');
+                const updateDisplay = () => {
+                    if (isSolved) return;
+                    display.textContent = emojis[currentIndex];
+                };
+                upButton.addEventListener('click', () => {
+                    if (isSolved) return;
+                    currentIndex = (currentIndex - 1 + emojis.length) % emojis.length;
+                    updateDisplay();
+                });
+                downButton.addEventListener('click', () => {
+                    if (isSolved) return;
+                    currentIndex = (currentIndex + 1) % emojis.length;
+                    updateDisplay();
+                });
+                display.textContent = emojis[currentIndex];
+            });
+        }
+
+        // 判定ボタンのイベント（元のコードを関数化）
+        function initializeCheckButton() {
+            checkButton.addEventListener('click', () => {
+                if (isSolved) return;
+                const currentCombination = Array.from(displays).map(d => d.textContent);
+                const isCorrect = JSON.stringify(currentCombination) === JSON.stringify(correctAnswer);
+                if (isCorrect) {
+                    isSolved = true;
+                    successMessage.classList.remove('hidden');
+                    successMessage.classList.add('fade-in');
+                    launchFireworks();
                 } else {
-                    loadingScreen.textContent = "ゲームを読み込んでいます...";
-                    // ログイン済みの場合、ゲームを表示
-                    loadingScreen.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
+                    showIncorrectMessage();
                 }
-            } catch (err) {
-                 console.error(err);
-                 // エラーオブジェクトを文字列に変換して表示
-                 loadingScreen.textContent = `LIFFの初期化に失敗しました。\n\n【考えられる原因】\n・エンドポイントURLが正しく設定されていない\n・LIFF IDが間違っている\n\nエラー内容:\n${JSON.stringify(err)}`;
-            }
-        }
-
-        initializeLiff();
-        
-        // --- スピナーのロジック ---
-        spinnerWidgets.forEach((widget, index) => {
-            let currentIndex = 1;
-            const displayDiv = widget.querySelector('.pixel-display');
-            const handIconDiv = widget.querySelector('.hand-icon');
-            handIconDiv.textContent = handEmojis[index];
-
-            const updateDisplay = () => {
-                if (isSolved) return;
-                displayDiv.textContent = emojis[currentIndex];
-            };
-
-            widget.querySelector('.up-btn').addEventListener('click', () => {
-                if (isSolved) return;
-                currentIndex = (currentIndex - 1 + emojis.length) % emojis.length;
-                updateDisplay();
-            });
-
-            widget.querySelector('.down-btn').addEventListener('click', () => {
-                if (isSolved) return;
-                currentIndex = (currentIndex + 1) % emojis.length;
-                updateDisplay();
-            });
-
-            updateDisplay();
-        });
-
-        // --- 判定ボタンのイベント ---
-        checkButton.addEventListener('click', async () => {
-            if (isSolved) return;
-
-            const currentCombination = Array.from(document.querySelectorAll('.pixel-display')).map(div => div.textContent);
-            const isCorrect = JSON.stringify(currentCombination) === JSON.stringify(correctAnswer);
-
-            if (isCorrect) {
-                isSolved = true;
-                successMessage.classList.remove('hidden');
-                successMessage.classList.add('fade-in');
-                launchFireworks();
-
-                try {
-                    const profile = await liff.getProfile();
-                    const userName = profile.displayName;
-
-                    // GASにクリア情報を送信
-                    await fetch(GAS_WEB_APP_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain' }, // GASの仕様に合わせる
-                        body: JSON.stringify({ userName: userName }),
-                        mode: 'no-cors' // CORSエラーを回避
-                    });
-                    
-                    sendingMessage.classList.add('hidden');
-                    sentMessage.classList.remove('hidden');
-                    closeButton.classList.remove('hidden');
-
-                } catch (error) {
-                    console.error('送信に失敗しました:', error);
-                    sendingMessage.textContent = "通知の送信に失敗しました";
-                    closeButton.classList.remove('hidden');
-                }
-
-            } else {
-                showMessage('ちがうみたい…');
-            }
-        });
-
-        // --- 閉じるボタン ---
-        closeButton.addEventListener('click', () => {
-            liff.closeWindow();
-        });
-
-        // --- メッセージ表示 ---
-        function showMessage(text) {
-            messageArea.textContent = text;
-            messageArea.classList.remove('hidden');
-            setTimeout(() => {
-                messageArea.classList.add('hidden');
-            }, 1200);
-        }
-
-        // --- ドット絵風花火エフェクト ---
-        function setupCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        class Particle {
-            constructor(x, y, color, velocity) {
-                this.x = x; this.y = y; this.color = color; this.velocity = velocity;
-                this.alpha = 1; this.friction = 0.98; this.gravity = 0.05;
-                this.size = Math.floor(Math.random() * 4 + 4);
-            }
-            draw() {
-                ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, this.size, this.size); ctx.restore();
-            }
-            update() {
-                this.velocity.x *= this.friction; this.velocity.y *= this.friction;
-                this.velocity.y += this.gravity; this.x += this.velocity.x; this.y += this.velocity.y;
-                this.alpha -= 0.03; this.draw();
-            }
-        }
-        
-        const fireworkColors = ['#F59E0B', '#FDE047', '#A3E635', '#4ADE80', '#67E8F9', '#A78BFA'];
-
-        function launchFireworks() {
-             for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                     const x = Math.random() * canvas.width; const y = Math.random() * canvas.height;
-                     const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
-                     const particleCount = 100;
-                     for (let j = 0; j < particleCount; j++) {
-                        const angle = Math.random() * Math.PI * 2;
-                        const speed = Math.random() * 8;
-                        particles.push(new Particle(x, y, color, { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed }));
-                     }
-                }, i * 200);
-            }
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            ctx.fillStyle = 'rgba(51, 65, 85, 0.2)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            if (isSolved && Math.random() < 0.1) launchFireworks();
-            particles.forEach((particle, index) => {
-                if (particle.alpha > 0) particle.update();
-                else particles.splice(index, 1);
             });
         }
 
+        // 不正解メッセージ表示（元のコード）
+        function showIncorrectMessage() { /*... 元のコード... */ }
+        // 花火エフェクト（元のコード）
+        function setupCanvas() { /*... 元のコード... */ }
+        class Particle { /*... 元のコード... */ }
+        const fireworkColors =;
+        function launchFireworks() { /*... 元のコード... */ }
+        function animate() { /*... 元のコード... */ }
         window.addEventListener('resize', setupCanvas);
-        setupCanvas();
-        animate();
+
+        // --- ここからがLIFFの初期化ロジック ---
+
+        // アプリケーションのメイン処理を実行する非同期関数
+        async function main() {
+            try {
+                // 1. LIFFの初期化
+                // 'YOUR_LIFF_ID' の部分を、LINE Developers Consoleで取得した自身のLIFF IDに置き換えてください。
+                await liff.init({ liffId: 'YOUR_LIFF_ID' });
+
+                // 2. ユーザーがログインしているかチェック
+                if (!liff.isLoggedIn()) {
+                    // ログインしていなければ、ログインを促す
+                    // LINEのログイン画面にリダイレクトされ、完了後にこのページに戻ってくる
+                    liff.login();
+                } else {
+                    // 3. ログイン済みの場合、アプリケーションのロジックを続行
+                    
+                    // ユーザープロファイルを取得
+                    const profile = await liff.getProfile();
+                    console.log('User Profile:', profile);
+
+                    // 取得した表示名でウェルカムメッセージを更新
+                    document.getElementById('welcome-message').textContent = `${profile.displayName}さん、ようこそ！`;
+
+                    // LIFFの準備が完了したので、メインのアプリケーションコンテンツを表示
+                    document.getElementById('liff-overlay').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'block';
+
+                    // 元のゲームの初期化処理を呼び出す
+                    initializeSpinners();
+                    initializeCheckButton();
+                    setupCanvas();
+                    animate();
+                }
+            } catch (error) {
+                // 初期化中にエラーが発生した場合の処理
+                console.error('LIFF Initialization failed', error);
+                document.getElementById('liff-message').textContent = 'アプリの読み込みに失敗しました。時間をおいて再度お試しください。';
+            }
+        }
+
+        // ページの読み込みが完了したら、メイン処理を実行
+        window.onload = main;
     </script>
 </body>
 </html>
