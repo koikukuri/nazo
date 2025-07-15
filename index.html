@@ -6,6 +6,8 @@
     <title>じゃんけん謎</title>
     <!-- LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- vConsole (デバッグツール) -->
+    <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
     <!-- Google Fonts (ドット絵フォント) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,12 +159,16 @@
     </div>
 
     <script>
+        // --- ★★★ 修正点：デバッグツール(vConsole)を初期化 ★★★ ---
+        const vConsole = new VConsole();
+        console.log("デバッグツール(vConsole)を初期化しました。");
+
         // --- LIFF & GAS 設定 ---
         const LIFF_ID = "2007667389-zrkMpOk3"; 
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZr8t5h-G4oBpVVpbqB-xkb79ny5y8TaaIftMJffbQpYA1QWYDuOQE3byYyFZRx1xg/exec";
 
         // --- ゲーム設定 ---
-        const emojis = ['🚥', '🧋', '�', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
+        const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
         const correctAnswer = ['🚥', '🍜', '🐷'];
         const handEmojis = ['✊', '✌️', '✋'];
 
@@ -183,6 +189,7 @@
 
         // --- ゲームの初期化処理をまとめた関数 ---
         function initializeGame() {
+            console.log("initializeGame() 関数を開始します。");
             // スピナーのロジック
             spinnerWidgets.forEach((widget, index) => {
                 let currentIndex = 1;
@@ -209,6 +216,7 @@
 
                 updateDisplay();
             });
+            console.log("スピナーのセットアップが完了しました。");
 
             // 判定ボタンのイベント
             checkButton.addEventListener('click', async () => {
@@ -223,14 +231,19 @@
                     launchFireworks();
 
                     try {
+                        console.log("正解です。プロファイルの取得を開始します。");
                         const profile = await liff.getProfile();
                         const userName = profile.displayName;
+                        console.log(`プロファイル取得成功: ${userName}`);
+                        
                         await fetch(GAS_WEB_APP_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'text/plain' },
                             body: JSON.stringify({ userName: userName }),
                             mode: 'no-cors'
                         });
+                        console.log("GASへのデータ送信を試みました。");
+                        
                         sendingMessage.classList.add('hidden');
                         sentMessage.classList.remove('hidden');
                         closeButton.classList.remove('hidden');
@@ -243,6 +256,7 @@
                     showMessage('ちがうみたい…');
                 }
             });
+            console.log("判定ボタンのセットアップが完了しました。");
 
             // 閉じるボタン
             closeButton.addEventListener('click', () => {
@@ -253,42 +267,47 @@
             setupCanvas();
             animate();
             window.addEventListener('resize', setupCanvas);
+            console.log("花火エフェクトのセットアップが完了しました。");
+            console.log("initializeGame() 関数が正常に終了しました。");
         }
 
         // --- LIFF初期化 ---
         async function main() {
             loadingScreen.textContent = "LIFFの準備をしています...";
+            console.log("main() 関数を開始します。");
             try {
                 await liff.init({ liffId: LIFF_ID });
+                console.log("liff.init() が成功しました。");
                 
                 loadingScreen.textContent = "ログイン状態を確認中...";
                 if (!liff.isLoggedIn()) {
+                    console.log("未ログインのため、ログイン画面に遷移します。");
                     loadingScreen.textContent = "ログイン画面に移動します...";
                     liff.login();
                 } else {
-                    // 修正点：ゲーム初期化をtry-catchで囲み、エラーを捕捉する
+                    console.log("ログイン済みです。");
                     try {
                         loadingScreen.textContent = "ゲームを読み込んでいます...";
+                        console.log("ゲームの読み込みを開始します。");
+                        
                         loadingScreen.classList.add('hidden');
                         mainContent.classList.remove('hidden');
+                        console.log("メインコンテンツを表示しました。");
                         
-                        // LIFFの準備完了後にゲームの初期化処理を呼び出す
                         initializeGame();
                     } catch (gameError) {
                         console.error("ゲームの初期化中にエラーが発生しました:", gameError);
-                        // エラーが発生した場合、ローディング画面を再表示してエラーメッセージを見せる
                         loadingScreen.classList.remove('hidden');
                         mainContent.classList.add('hidden');
                         loadingScreen.textContent = `ゲームの読み込みに失敗しました。\n\nエラー内容:\n${gameError.stack || JSON.stringify(gameError)}`;
                     }
                 }
             } catch (err) {
-                 console.error(err);
+                 console.error("liff.init() でエラーが発生しました:", err);
                  loadingScreen.textContent = `LIFFの初期化に失敗しました。\n\n【考えられる原因】\n・LIFF IDが間違っている\n・エンドポイントURLが正しく設定されていない\n\nエラー内容:\n${JSON.stringify(err)}`;
             }
         }
         
-        // 修正点：ページのDOMが完全に読み込まれてからメイン処理を実行する
         document.addEventListener('DOMContentLoaded', main);
 
         // --- メッセージ表示 ---
@@ -353,4 +372,3 @@
     </script>
 </body>
 </html>
-�
