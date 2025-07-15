@@ -3,104 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF 最小機能テスト</title>
+    <title>じゃんけん謎</title>
     <!-- LIFF SDK -->
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- Google Fonts (ドット絵フォント) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'DotGothic16', sans-serif;
+            background-color: #334155;
+            image-rendering: pixelated;
+        }
+        .pixel-container {
+            background-color: #F1F5F9;
+            border: 4px solid #1E293B;
+            box-shadow: 8px 8px 0px #1E293B;
+        }
+        .pixel-btn {
+            background-color: #64748B;
+            color: white;
+            border: 4px solid #1E293B;
+            box-shadow: 2px 2px 0px #1E293B;
+            transition: all 0.1s;
+            user-select: none;
+        }
+        .pixel-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+        .arrow-btn {
+            padding: 4px;
+            font-size: 1.2rem;
+        }
+        .pixel-display {
+            background-color: #CBD5E1;
+            border: 4px solid #475569;
+            height: 80px;
+            width: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
-            color: #1c1e21;
+            font-size: 3rem;
+            line-height: 1;
         }
-        #container {
+        .hand-icon {
+            font-size: 2.5rem; 
+        }
+        #success-message {
+             background-color: rgba(30, 41, 59, 0.9);
+             border: 4px solid #F1F5F9;
+        }
+        .close-btn {
+            background-color: #ef4444;
+        }
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        /* ローディング画面 */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #334155;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
             text-align: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        #profile-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            margin-bottom: 1rem;
-        }
-        #status {
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-        #error-details {
-            color: #fa383e;
-            font-size: 0.8rem;
+            padding: 1rem;
             white-space: pre-wrap;
-            word-break: break-all;
-            background-color: #fbe3e4;
-            padding: 10px;
-            border-radius: 4px;
-            text-align: left;
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center h-screen overflow-hidden p-4">
 
-    <div id="container">
-        <p id="status">LIFFアプリを初期化しています...</p>
-        <div id="profile-info" style="display: none;">
-            <img id="profile-image" alt="プロフィール画像">
-            <p id="user-name"></p>
+    <div id="loading">よみこみちゅう...</div>
+
+    <!-- 花火エフェクト用のキャンバス -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <div id="main-content" class="relative w-full max-w-sm" style="display: none;">
+        <div id="game-container" class="pixel-container p-6">
+            
+            <!-- スピナー -->
+            <div class="flex justify-around items-end">
+                <!-- スピナー 1 -->
+                <div class="spinner-widget text-center">
+                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
+                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
+                    <div class="pixel-display my-1"></div>
+                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                </div>
+                <!-- スピナー 2 -->
+                <div class="spinner-widget text-center">
+                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
+                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
+                    <div class="pixel-display my-1"></div>
+                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                </div>
+                <!-- スピナー 3 -->
+                <div class="spinner-widget text-center">
+                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
+                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
+                    <div class="pixel-display my-1"></div>
+                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                </div>
+            </div>
+            
+            <!-- 判定ボタン -->
+            <div class="mt-8 text-center">
+                <button id="check-btn" class="pixel-btn bg-sky-500 py-3 px-10 text-xl">
+                    けってい
+                </button>
+            </div>
         </div>
-        <div id="error-details" style="display: none;"></div>
+
+        <!-- 正解メッセージ -->
+        <div id="success-message" class="hidden absolute inset-0 text-white p-6 flex flex-col items-center justify-center text-center">
+            <h2 class="text-4xl mb-4">クリア!</h2>
+            <p id="sending-message" class="text-lg mb-6">みんなに通知を送信中...</p>
+            <p id="sent-message" class="text-lg mb-6 hidden">送信しました！</p>
+            <button id="close-btn" class="pixel-btn close-btn py-3 px-10 text-xl hidden">
+                とじる
+            </button>
+        </div>
+
+        <!-- メッセージ表示エリア -->
+        <div id="message-area" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white font-bold py-3 px-5 border-4 border-slate-900">
+        </div>
     </div>
 
     <script>
-        const LIFF_ID = "2007667389-zrkMpOk3";
+        // --- LIFF & GAS 設定 ---
+        const LIFF_ID = "2007667389-zrkMpOk3"; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZr8t5h-G4oBpVVpbqB-xkb79ny5y8TaaIftMJffbQpYA1QWYDuOQE3byYyFZRx1xg/exec";
 
-        async function main() {
-            const statusElement = document.getElementById('status');
-            const profileInfoElement = document.getElementById('profile-info');
-            const profileImageElement = document.getElementById('profile-image');
-            const userNameElement = document.getElementById('user-name');
-            const errorElement = document.getElementById('error-details');
+        // --- ゲーム設定 ---
+        const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
+        const correctAnswer = ['🚥', '🍜', '🐷'];
+        const handEmojis = ['✊', '✌️', '✋'];
 
-            try {
-                // 1. LIFFの初期化
-                statusElement.textContent = "LIFFサーバーに接続しています...";
-                await liff.init({ liffId: LIFF_ID });
+        // --- 要素の取得 ---
+        const loadingScreen = document.getElementById('loading');
+        const mainContent = document.getElementById('main-content');
+        let isSolved = false;
 
-                // 2. ログイン状態の確認
-                statusElement.textContent = "ログイン状態を確認しています...";
-                if (!liff.isLoggedIn()) {
-                    statusElement.textContent = "ログイン画面に移動します...";
-                    liff.login();
-                    return; // login()はリダイレクトするので、ここで処理を終了
+        // --- ゲームの初期化処理をまとめた関数 ---
+        function initializeGame() {
+            const spinnerWidgets = document.querySelectorAll('.spinner-widget');
+            const checkButton = document.getElementById('check-btn');
+            const successMessage = document.getElementById('success-message');
+            const sendingMessage = document.getElementById('sending-message');
+            const sentMessage = document.getElementById('sent-message');
+            const closeButton = document.getElementById('close-btn');
+            const messageArea = document.getElementById('message-area');
+            const canvas = document.getElementById('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            // スピナーのロジック
+            spinnerWidgets.forEach((widget, index) => {
+                let currentIndex = 1;
+                const displayDiv = widget.querySelector('.pixel-display');
+                const handIconDiv = widget.querySelector('.hand-icon');
+                handIconDiv.textContent = handEmojis[index];
+
+                const updateDisplay = () => {
+                    if (isSolved) return;
+                    displayDiv.textContent = emojis[currentIndex];
+                };
+
+                widget.querySelector('.up-btn').addEventListener('click', () => {
+                    if (isSolved) return;
+                    currentIndex = (currentIndex - 1 + emojis.length) % emojis.length;
+                    updateDisplay();
+                });
+
+                widget.querySelector('.down-btn').addEventListener('click', () => {
+                    if (isSolved) return;
+                    currentIndex = (currentIndex + 1) % emojis.length;
+                    updateDisplay();
+                });
+
+                updateDisplay();
+            });
+
+            // 判定ボタンのイベント
+            checkButton.addEventListener('click', async () => {
+                if (isSolved) return;
+                const currentCombination = Array.from(document.querySelectorAll('.pixel-display')).map(div => div.textContent);
+                const isCorrect = JSON.stringify(currentCombination) === JSON.stringify(correctAnswer);
+
+                if (isCorrect) {
+                    isSolved = true;
+                    successMessage.classList.remove('hidden');
+                    successMessage.classList.add('fade-in');
+                    launchFireworks();
+
+                    try {
+                        const profile = await liff.getProfile();
+                        const userName = profile.displayName;
+                        await fetch(GAS_WEB_APP_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain' },
+                            body: JSON.stringify({ userName: userName }),
+                            mode: 'no-cors'
+                        });
+                        sendingMessage.classList.add('hidden');
+                        sentMessage.classList.remove('hidden');
+                        closeButton.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('送信に失敗しました:', error);
+                        sendingMessage.textContent = "通知の送信に失敗しました";
+                        closeButton.classList.remove('hidden');
+                    }
+                } else {
+                    showMessage('ちがうみたい…');
                 }
+            });
 
-                // 3. プロファイルの取得
-                statusElement.textContent = "ユーザー情報を取得しています...";
-                const profile = await liff.getProfile();
-
-                // 4. 成功時の画面表示
-                statusElement.style.display = 'none'; // ステータスメッセージを隠す
-                profileInfoElement.style.display = 'block'; // プロフィール情報を表示
-                
-                profileImageElement.src = profile.pictureUrl;
-                userNameElement.textContent = `${profile.displayName} さん、こんにちは！`;
-
-            } catch (error) {
-                // 5. エラー発生時の画面表示
-                console.error(error);
-                statusElement.textContent = "エラーが発生しました。";
-                errorElement.style.display = 'block';
-                errorElement.textContent = `エラーコード: ${error.code}\n\n詳細:\n${error.message}`;
+            // 閉じるボタン
+            closeButton.addEventListener('click', () => {
+                liff.closeWindow();
+            });
+            
+            // メッセージ表示
+            function showMessage(text) {
+                messageArea.textContent = text;
+                messageArea.classList.remove('hidden');
+                setTimeout(() => {
+                    messageArea.classList.add('hidden');
+                }, 1200);
             }
+
+            // 花火エフェクト
+            function setupCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            class Particle {
+                constructor(x, y, color, velocity) {
+                    this.x = x; this.y = y; this.color = color; this.velocity = velocity;
+                    this.alpha = 1; this.friction = 0.98; this.gravity = 0.05;
+                    this.size = Math.floor(Math.random() * 4 + 4);
+                }
+                draw() {
+                    ctx.save(); ctx.globalAlpha = this.alpha; ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, this.size, this.size); ctx.restore();
+                }
+                update() {
+                    this.velocity.x *= this.friction; this.velocity.y *= this.friction;
+                    this.velocity.y += this.gravity; this.x += this.velocity.x; this.y += this.velocity.y;
+                    this.alpha -= 0.03; this.draw();
+                }
+            }
+            
+            const fireworkColors = ['#F59E0B', '#FDE047', '#A3E635', '#4ADE80', '#67E8F9', '#A78BFA'];
+
+            function launchFireworks() {
+                 for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                         const x = Math.random() * canvas.width; const y = Math.random() * canvas.height;
+                         const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+                         const particleCount = 100;
+                         for (let j = 0; j < particleCount; j++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const speed = Math.random() * 8;
+                            particles.push(new Particle(x, y, color, { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed }));
+                         }
+                    }, i * 200);
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.fillStyle = 'rgba(51, 65, 85, 0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if (isSolved && Math.random() < 0.1) launchFireworks();
+                particles.forEach((particle, index) => {
+                    if (particle.alpha > 0) particle.update();
+                    else particles.splice(index, 1);
+                });
+            }
+
+            // 花火の初期化とアニメーション開始
+            setupCanvas();
+            animate();
+            window.addEventListener('resize', setupCanvas);
         }
 
-        // ページの読み込みが完了したらメイン処理を実行
+        // --- LIFF初期化 ---
+        async function main() {
+            loadingScreen.textContent = "LIFFの準備をしています...";
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                } else {
+                    // ★★★ 修正点 ★★★
+                    // 画面の表示切替を、より確実な方法に変更
+                    loadingScreen.style.display = 'none';
+                    mainContent.style.display = 'block';
+                    
+                    initializeGame();
+                }
+            } catch (err) {
+                 console.error(err);
+                 loadingScreen.textContent = `LIFFの初期化に失敗しました。\n\nエラー内容:\n${JSON.stringify(err)}`;
+            }
+        }
+        
+        // ページのDOMが完全に読み込まれてからメイン処理を実行する
         document.addEventListener('DOMContentLoaded', main);
     </script>
 </body>
