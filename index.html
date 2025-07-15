@@ -162,7 +162,7 @@
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyZr8t5h-G4oBpVVpbqB-xkb79ny5y8TaaIftMJffbQpYA1QWYDuOQE3byYyFZRx1xg/exec";
 
         // --- ゲーム設定 ---
-        const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
+        const emojis = ['🚥', '🧋', '�', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
         const correctAnswer = ['🚥', '🍜', '🐷'];
         const handEmojis = ['✊', '✌️', '✋'];
 
@@ -252,6 +252,7 @@
             // 花火の初期化
             setupCanvas();
             animate();
+            window.addEventListener('resize', setupCanvas);
         }
 
         // --- LIFF初期化 ---
@@ -265,19 +266,30 @@
                     loadingScreen.textContent = "ログイン画面に移動します...";
                     liff.login();
                 } else {
-                    loadingScreen.textContent = "ゲームを読み込んでいます...";
-                    loadingScreen.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    
-                    // LIFFの準備完了後にゲームの初期化処理を呼び出す
-                    initializeGame();
+                    // 修正点：ゲーム初期化をtry-catchで囲み、エラーを捕捉する
+                    try {
+                        loadingScreen.textContent = "ゲームを読み込んでいます...";
+                        loadingScreen.classList.add('hidden');
+                        mainContent.classList.remove('hidden');
+                        
+                        // LIFFの準備完了後にゲームの初期化処理を呼び出す
+                        initializeGame();
+                    } catch (gameError) {
+                        console.error("ゲームの初期化中にエラーが発生しました:", gameError);
+                        // エラーが発生した場合、ローディング画面を再表示してエラーメッセージを見せる
+                        loadingScreen.classList.remove('hidden');
+                        mainContent.classList.add('hidden');
+                        loadingScreen.textContent = `ゲームの読み込みに失敗しました。\n\nエラー内容:\n${gameError.stack || JSON.stringify(gameError)}`;
+                    }
                 }
             } catch (err) {
                  console.error(err);
                  loadingScreen.textContent = `LIFFの初期化に失敗しました。\n\n【考えられる原因】\n・LIFF IDが間違っている\n・エンドポイントURLが正しく設定されていない\n\nエラー内容:\n${JSON.stringify(err)}`;
             }
         }
-        main(); // ページの読み込みと同時に実行開始
+        
+        // 修正点：ページのDOMが完全に読み込まれてからメイン処理を実行する
+        document.addEventListener('DOMContentLoaded', main);
 
         // --- メッセージ表示 ---
         function showMessage(text) {
@@ -338,8 +350,7 @@
                 else particles.splice(index, 1);
             });
         }
-
-        window.addEventListener('resize', setupCanvas);
     </script>
 </body>
 </html>
+�
