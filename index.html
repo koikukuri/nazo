@@ -3,260 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koi-Kukuri イベント申し込みフォーム</title>
+    <title>じゃんけん謎</title>
+    <!-- Google Fonts (ドット絵フォント) を読み込みます -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <!-- Tailwind CSSを読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesomeを読み込みます -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ドット絵フォントを全体に適用 */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fce4ec; /* 背景を薄いピンクに */
-            color: #333;
-            margin: 0;
-            padding: 20px;
+            font-family: 'DotGothic16', sans-serif;
+            background-color: #334155; /* レトロな背景色 */
+            image-rendering: pixelated; /* 画像がぼやけないように */
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        /* ピクセルアート風のコンテナ */
+        .pixel-container {
+            background-color: #F1F5F9;
+            border: 4px solid #1E293B;
+            box-shadow: 8px 8px 0px #1E293B;
         }
-        h1 {
-            text-align: center;
-            color: #d81b60; /* メインカラー */
-            font-size: 24px;
-            margin-bottom: 10px;
+        /* ピクセルアート風のボタン */
+        .pixel-btn {
+            background-color: #64748B;
+            color: white;
+            border: 4px solid #1E293B;
+            /* 影を小さく調整 */
+            box-shadow: 2px 2px 0px #1E293B;
+            transition: all 0.1s;
+            user-select: none;
         }
-        .intro-text {
-            text-align: center;
-            font-size: 15px;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 20px;
+        .pixel-btn:active {
+            /* 押したときの動きを影のサイズに合わせる */
+            transform: translate(2px, 2px);
+            box-shadow: none;
         }
-        .event-details {
-            text-align: center;
-            background-color: #fffde7;
-            border: 1px dashed #fbc02d;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            font-size: 16px;
+        /* 矢印ボタンのサイズを調整 */
+        .arrow-btn {
+            padding: 4px;
+            font-size: 1.2rem;
         }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        input[type="text"],
-        input[type="number"],
-        input[type="file"],
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-        }
-        input[type="file"] {
-            padding: 5px;
-        }
-        .file-note {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-        }
-        .privacy-policy {
-            margin-top: 25px;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            height: 120px;
-            overflow-y: scroll;
-            background-color: #f9f9f9;
-            font-size: 12px;
-            color: #555;
-        }
-        .checkbox-group {
+        /* 絵文字表示部分 */
+        .pixel-display {
+            background-color: #CBD5E1;
+            border: 4px solid #475569;
+            height: 80px;
+            width: 80px;
             display: flex;
             align-items: center;
-            margin-top: 15px;
+            justify-content: center;
+            font-size: 3rem; /* 絵文字サイズ */
+            line-height: 1;
         }
-        .checkbox-group input {
-            margin-right: 10px;
+        .hand-icon {
+            /* じゃんけん絵文字サイズを大きく */
+            font-size: 2.5rem; 
         }
-        .submit-btn {
-            width: 100%;
-            background-color: #d81b60; /* ボタンの背景色 */
+        /* 正解メッセージ */
+        #success-message {
+             background-color: rgba(30, 41, 59, 0.9);
+             border: 4px solid #F1F5F9;
+        }
+        /* LINEボタンのスタイル */
+        .line-btn {
+            background-color: #06C755;
             color: white;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .submit-btn:hover {
-            background-color: #c2185b;
-        }
-        .submit-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        #submission-complete {
-            text-align: center;
-            padding: 40px 20px;
-        }
-         #submission-complete h2 {
-            color: #d81b60;
-         }
-        .button-group {
-            margin-top: 20px;
-        }
-        .button-group a {
-            display: inline-block;
             padding: 12px 24px;
-            margin: 5px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.2rem;
         }
-        .profile-btn {
-            background-color: #d81b60;
-            color: white;
+        /* 花火エフェクト用のキャンバス */
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
         }
-        .later-btn {
-            background-color: #eee;
-            color: #333;
+        /* アニメーション */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
-<body>
+<body class="flex items-center justify-center h-screen overflow-hidden p-4">
 
-    <div class="container" id="form-container">
-        <h1>Koi-Kukuri イベント申し込み</h1>
-        
-        <p class="intro-text">
-            イベントにご興味をお持ちいただきありがとうございます。<br>サービスの品質向上のため、テストプレイへのご協力をお願いいたします。
-        </p>
-        <div class="event-details">
-            <strong>開催日時:</strong> 2025年8月3日(日) 14:00〜16:00
-        </div>
-        
-        <form id="applicationForm">
-            <input type="hidden" id="lineUserId" name="lineUserId">
+    <!-- 花火エフェクト用のキャンバス -->
+    <canvas id="fireworks-canvas"></canvas>
 
-            <div class="form-group">
-                <label for="name">氏名</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="age">年齢</label>
-                <input type="number" id="age" name="age" min="18" required>
-            </div>
-
-            <div class="form-group">
-                <label for="gender">性別</label>
-                <select id="gender" name="gender" required>
-                    <option value="">選択してください</option>
-                    <option value="男性">男性</option>
-                    <option value="女性">女性</option>
-                    <option value="その他">その他</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="prefecture">都道府県</label>
-                <select id="prefecture" name="prefecture" required>
-                    <option value="">選択してください</option>
-                    <option value="北海道">北海道</option><option value="青森県">青森県</option><option value="岩手県">岩手県</option><option value="宮城県">宮城県</option><option value="秋田県">秋田県</option><option value="山形県">山形県</option><option value="福島県">福島県</option><option value="茨城県">茨城県</option><option value="栃木県">栃木県</option><option value="群馬県">群馬県</option><option value="埼玉県">埼玉県</option><option value="千葉県">千葉県</option><option value="東京都">東京都</option><option value="神奈川県">神奈川県</option><option value="新潟県">新潟県</option><option value="富山県">富山県</option><option value="石川県">石川県</option><option value="福井県">福井県</option><option value="山梨県">山梨県</option><option value="長野県">長野県</option><option value="岐阜県">岐阜県</option><option value="静岡県">静岡県</option><option value="愛知県">愛知県</option><option value="三重県">三重県</option><option value="滋賀県">滋賀県</option><option value="京都府">京都府</option><option value="大阪府">大阪府</option><option value="兵庫県">兵庫県</option><option value="奈良県">奈良県</option><option value="和歌山県">和歌山県</option><option value="鳥取県">鳥取県</option><option value="島根県">島根県</option><option value="岡山県">岡山県</option><option value="広島県">広島県</option><option value="山口県">山口県</option><option value="徳島県">徳島県</option><option value="香川県">香川県</option><option value="愛媛県">愛媛県</option><option value="高知県">高知県</option><option value="福岡県">福岡県</option><option value="佐賀県">佐賀県</option><option value="長崎県">長崎県</option><option value="熊本県">熊本県</option><option value="大分県">大分県</option><option value="宮崎県">宮崎県</option><option value="鹿児島県">鹿児島県</option><option value="沖縄県">沖縄県</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="id-upload">身分証アップロード</label>
-                <input type="file" id="id-upload" name="id-upload" accept="image/*">
-                <p class="file-note">※テストプレイのため、提出は任意です。</p>
-            </div>
-
-            <div class="privacy-policy">
-                <p><strong>プライバシーポリシー</strong></p>
-                <p>（以下はサンプルです。）</p>
-                <p>Koi-Kukuri運営事務局（以下「当事務局」といいます。）は、本サービスの利用者（以下「ユーザー」といいます。）の個人情報を、以下のとおり取り扱います。</p>
-                <p>第1条（個人情報の取得）<br>当事務局は、ユーザーが本サービスを利用するにあたり、氏名、年齢、性別、連絡先、その他申込フォームにご入力いただいた情報を取得します。</p>
-                <p>第2条（利用目的）<br>取得した個人情報は、イベント運営、本人確認、お問い合わせ対応、及びサービスの改善のために利用します。</p>
-                <p>第3条（第三者提供）<br>当事務局は、法令に基づく場合を除き、ユーザーの同意なく個人情報を第三者に提供しません。</p>
-                <p>（本番運用開始までに、運用に合わせて内容を修正・追記。）</p>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="privacy-consent" name="privacy-consent" required>
-                <label for="privacy-consent">プライバシーポリシーに同意します</label>
+    <div class="relative w-full max-w-sm">
+        <div id="game-container" class="pixel-container p-6">
+            
+            <!-- スピナー -->
+            <div class="flex justify-around items-end">
+                <!-- スピナー 1 -->
+                <div class="spinner-widget text-center">
+                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
+                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
+                    <div class="pixel-display my-1"></div>
+                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                </div>
+                <!-- スピナー 2 -->
+                <div class="spinner-widget text-center">
+                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
+                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
+                    <div class="pixel-display my-1"></div>
+                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                </div>
+                <!-- スピナー 3 -->
+                <div class="spinner-widget text-center">
+                    <div class="hand-icon h-10 mb-2 flex items-center justify-center"></div>
+                    <button class="spinner-btn up-btn pixel-btn arrow-btn w-full">▲</button>
+                    <div class="pixel-display my-1"></div>
+                    <button class="spinner-btn down-btn pixel-btn arrow-btn w-full">▼</button>
+                </div>
             </div>
             
-            <br>
-            <button type="submit" class="submit-btn">申し込みを確定する</button>
-        </form>
-    </div>
+            <!-- 判定ボタン -->
+            <div class="mt-8 text-center">
+                <button id="check-btn" class="pixel-btn bg-sky-500 py-3 px-10 text-xl">
+                    けってい
+                </button>
+            </div>
+        </div>
 
-    <div class="container" id="submission-complete" style="display: none;">
-        <h2>お申し込み<br>ありがとうございます！</h2>
-        <p>イベントへの申し込みが完了しました。<br>次に、イベントで使用するプロフィールの登録をお願いします。</p>
-        <div class="button-group">
-            <a href="YOUR_PROFILE_REGISTRATION_URL" class="profile-btn">プロフィール登録に進む</a>
-            <a href="#" onclick="liff.closeWindow(); return false;" class="later-btn">後で登録する</a>
+        <!-- 正解メッセージ -->
+        <div id="success-message" class="hidden absolute inset-0 text-white p-6 flex flex-col items-center justify-center text-center">
+            <h2 class="text-4xl mb-6">クリア!</h2>
+            <p class="text-xl mb-8">おめでとう！</p>
+            <a id="line-share-btn" href="#" target="_blank" class="line-btn pixel-btn">
+                <i class="fab fa-line"></i>
+                <span>ほうこくする</span>
+            </a>
+        </div>
+
+        <!-- メッセージ表示エリア -->
+        <div id="message-area" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white font-bold py-3 px-5 border-4 border-slate-900">
         </div>
     </div>
 
-
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script>
-        async function main() {
-            // LIFFの初期化
-            // TODO: あなたのLIFF IDをここに設定してください
-            await liff.init({ liffId: "2007667389-LbQyBzQX" });
+        // --- 設定 ---
+        const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
+        const correctAnswer = ['🚥', '🍜', '🐷'];
+        const handEmojis = ['✊', '✌️', '✋'];
 
-            if (!liff.isLoggedIn()) {
-                // ログインしていない場合はログイン画面に誘導
-                liff.login();
-            } else {
-                // ログイン済みの場合はプロフィール情報を取得
-                const profile = await liff.getProfile();
+        // --- 要素の取得 ---
+        const spinnerWidgets = document.querySelectorAll('.spinner-widget');
+        const checkButton = document.getElementById('check-btn');
+        const successMessage = document.getElementById('success-message');
+        const messageArea = document.getElementById('message-area');
+        const lineShareBtn = document.getElementById('line-share-btn');
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let isSolved = false;
+
+        // --- スピナーのロジック ---
+        spinnerWidgets.forEach((widget, index) => {
+            let currentIndex = 1; // 初期表示を「🧋」にする
+            const displayDiv = widget.querySelector('.pixel-display');
+            const handIconDiv = widget.querySelector('.hand-icon');
+            const upButton = widget.querySelector('.up-btn');
+            const downButton = widget.querySelector('.down-btn');
+
+            handIconDiv.textContent = handEmojis[index];
+
+            const updateDisplay = () => {
+                if (isSolved) return;
+                displayDiv.textContent = emojis[currentIndex];
+            };
+
+            upButton.addEventListener('click', () => {
+                if (isSolved) return;
+                currentIndex = (currentIndex - 1 + emojis.length) % emojis.length;
+                updateDisplay();
+            });
+
+            downButton.addEventListener('click', () => {
+                if (isSolved) return;
+                currentIndex = (currentIndex + 1) % emojis.length;
+                updateDisplay();
+            });
+
+            updateDisplay(); // 初期表示
+        });
+
+        // --- 判定ボタンのイベント ---
+        checkButton.addEventListener('click', () => {
+            if (isSolved) return;
+
+            const currentCombination = Array.from(document.querySelectorAll('.pixel-display')).map(div => div.textContent);
+            const isCorrect = JSON.stringify(currentCombination) === JSON.stringify(correctAnswer);
+
+            if (isCorrect) {
+                isSolved = true;
                 
-                // 隠しフィールドにLINE User IDをセット
-                document.getElementById('lineUserId').value = profile.userId;
+                const lineMessage = `【謎解きクリア！🎉】\nじゃんけんの謎を解きました！`;
+                const encodedMessage = encodeURIComponent(lineMessage);
+                lineShareBtn.href = `https://line.me/R/msg/text/?${encodedMessage}`;
+                
+                successMessage.classList.remove('hidden');
+                successMessage.classList.add('fade-in');
+                launchFireworks();
+            } else {
+                showMessage('ちがうみたい…');
+            }
+        });
 
-                // 氏名入力欄にLINEの表示名を初期値としてセット
-                document.getElementById('name').value = profile.displayName;
+        // --- メッセージ表示 ---
+        function showMessage(text) {
+            messageArea.textContent = text;
+            messageArea.classList.remove('hidden');
+            setTimeout(() => {
+                messageArea.classList.add('hidden');
+            }, 1200);
+        }
+
+        // --- ドット絵風花火エフェクト ---
+        function setupCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor(x, y, color, velocity) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = velocity;
+                this.alpha = 1;
+                this.friction = 0.98;
+                this.gravity = 0.05;
+                this.size = Math.floor(Math.random() * 4 + 4);
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.size, this.size);
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.03;
+                this.draw();
+            }
+        }
+        
+        const fireworkColors = ['#F59E0B', '#FDE047', '#A3E635', '#4ADE80', '#67E8F9', '#A78BFA'];
+
+        function launchFireworks() {
+             for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                     const x = Math.random() * canvas.width;
+                     const y = Math.random() * canvas.height;
+                     const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+                     const particleCount = 100;
+                     for (let j = 0; j < particleCount; j++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 8;
+                        particles.push(new Particle(x, y, color, { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed }));
+                     }
+                }, i * 200);
             }
         }
 
-        // ページの読み込みが完了したらmain関数を実行
-        main();
-
-        // フォーム送信時の処理
-        const form = document.getElementById('applicationForm');
-        form.addEventListener('submit', function(event) {
-            event.preventDefault(); // デフォルトの送信をキャンセル
-
-            const formData = new FormData(form);
-
-            // TODO: ここでサーバーにデータを送信する処理を実装します
-            const endpoint = 'YOUR_BACKEND_ENDPOINT_URL';
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(51, 65, 85, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // --- デモ用の挙動 ---
-            console.log('フォームデータ:', Object.fromEntries(formData));
-            alert('テスト送信が完了しました。\n実際にはこのデータをサーバーに送信します。');
-            document.getElementById('form-container').style.display = 'none';
-            document.getElementById('submission-complete').style.display = 'block';
-            // --- デモ用の挙動ここまで ---
-        });
+            if (isSolved && Math.random() < 0.1) {
+                launchFireworks();
+            }
+
+            particles.forEach((particle, index) => {
+                if (particle.alpha > 0) {
+                    particle.update();
+                } else {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+
+        window.addEventListener('resize', setupCanvas);
+        
+        // --- 初期化 ---
+        setupCanvas();
+        animate();
     </script>
 </body>
 </html>
