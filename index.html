@@ -159,7 +159,8 @@
     <script>
         // --- LIFF & GAS 設定 ---
         const LIFF_ID = "2007667389-zrkMpOk3"; 
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyNGoHc6dYRi-s0WDcZVSF3OaoHHRt81udv76fJ55Lf9qWAXbSaUUqRUkdWnL0Lqj-juA/exec";
+        // ★★★ 新しいデプロイURLを反映しました ★★★
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzJvYXNwqZhNv8SujSl1J_O4nOCEUOMAWdXNjPWaFFG1obYgLWADuDBQwhECqwWo2QBnw/exec";
 
         // --- ゲーム設定 ---
         const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
@@ -225,11 +226,11 @@
 
                     try {
                         const profile = await liff.getProfile();
-                        const userName = profile.displayName;
+                        const userId = profile.userId;
                         await fetch(GAS_WEB_APP_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'text/plain' },
-                            body: JSON.stringify({ userName: userName }),
+                            body: JSON.stringify({ userId: userId }),
                             mode: 'no-cors'
                         });
                         sendingMessage.classList.add('hidden');
@@ -325,8 +326,6 @@
                 if (!liff.isLoggedIn()) {
                     liff.login();
                 } else {
-                    // ★★★ 修正点 ★★★
-                    // 画面の表示切替を、より確実な方法に変更
                     loadingScreen.style.display = 'none';
                     mainContent.style.display = 'block';
                     
@@ -338,7 +337,6 @@
             }
         }
         
-        // ページのDOMが完全に読み込まれてからメイン処理を実行する
         document.addEventListener('DOMContentLoaded', main);
     </script>
 </body>
