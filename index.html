@@ -53,12 +53,45 @@
         #fireworks-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-        #loading { position: fixed; inset: 0; background-color: #334155; z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; text-align: center; padding: 1rem; }
+        #loading { position: fixed; inset: 0; background-color: #334155; z-index: 9999; display: flex; flex-col: items-center; justify-content: center; color: white; font-size: 1.2rem; text-align: center; padding: 1rem; space-y-6; }
+        
+        /* かわいいハートのスピナーアニメーション */
+        .heart-spinner {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            animation: heart-spin 1.2s infinite linear;
+        }
+        .heart-spinner::before,
+        .heart-spinner::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 30px;
+            width: 30px;
+            height: 50px;
+            background: #F1F5F9; /* 背景色に合わせた白系の色 */
+            border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .heart-spinner::after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        @keyframes heart-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="flex items-center justify-center h-screen overflow-hidden p-4">
 
-    <div id="loading">よみこみちゅう...</div>
+    <div id="loading">
+        <div class="heart-spinner"></div>
+        <p>よみこみちゅう...</p>
+    </div>
     <canvas id="fireworks-canvas"></canvas>
     <div id="main-content" class="relative w-full max-w-sm" style="display: none;">
         <div id="game-container" class="pixel-container p-6">
@@ -99,13 +132,13 @@
         // ----------------------------------------------------------------------
         // ★★★ 謎ごとにここを書き換えてください ★★★
         // ----------------------------------------------------------------------
-        const LIFF_ID = "YOUR_RIDDLE_LIFF_ID"; // この謎専用のLIFF ID
+        const LIFF_ID = "2007667389-zrkMpOk3"; // じゃんけん謎のLIFF ID
         const RIDDLE_NAME = "じゃんけんの謎"; // 通知メッセージに表示される謎の名前
         const correctAnswer = ['🚥', '🍜', '🐷']; // この謎の正解
         // ----------------------------------------------------------------------
 
         // --- 共通設定 ---
-        const GAS_WEB_APP_URL = "YOUR_SINGLE_GAS_URL"; // 統合版GASのURL
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzJvYXNwqZhNv8SujSl1J_O4nOCEUOMAWdXNjPWaFFG1obYgLWADuDBQwhECqwWo2QBnw/exec"; // 統合版GASのURL
 
         // --- ゲーム設定 ---
         const emojis = ['🚥', '🧋', '🍜', '🚗', '🦒', '🐷', '🦴', '🎆', '🥝', '🐷'];
@@ -175,7 +208,6 @@
                 setTimeout(() => messageArea.classList.add('hidden'), 1200);
             }
             
-            // 花火エフェクト... (省略)
             function launchFireworks() { /* ... */ }
             function animate() { /* ... */ }
             function setupCanvas() { /* ... */ }
@@ -184,16 +216,6 @@
 
         // --- LIFF初期化 ---
         async function main() {
-            // ★★★ 修正点：LIFF IDとGAS URLが設定されているかチェック ★★★
-            if (LIFF_ID === "YOUR_RIDDLE_LIFF_ID" || !LIFF_ID) {
-                loadingScreen.textContent = "エラー: LIFF IDが設定されていません。コード内の「YOUR_RIDDLE_LIFF_ID」をあなたのLIFF IDに置き換えてください。";
-                return;
-            }
-            if (GAS_WEB_APP_URL === "YOUR_SINGLE_GAS_URL" || !GAS_WEB_APP_URL) {
-                loadingScreen.textContent = "エラー: GASのURLが設定されていません。コード内の「YOUR_SINGLE_GAS_URL」をあなたのGASウェブアプリURLに置き換えてください。";
-                return;
-            }
-
             try {
                 await liff.init({ liffId: LIFF_ID });
                 if (!liff.isLoggedIn()) { liff.login(); } 
@@ -204,7 +226,7 @@
                 }
             } catch (err) {
                  console.error(err);
-                 loadingScreen.textContent = `LIFF初期化に失敗しました。\n\nLIFF IDが正しいか、LINE Developersコンソールで設定を確認してください。\n\nエラー内容: ${err.message}`;
+                 loadingScreen.textContent = `LIFF初期化に失敗: ${err.message}`;
             }
         }
         document.addEventListener('DOMContentLoaded', main);
