@@ -50,7 +50,7 @@
             font-size: 1.1em;
             cursor: pointer;
             border: none;
-            background-color: #28a745;
+            background-color: #007bff;
             color: white;
             border-radius: 5px;
             margin: 0 10px;
@@ -61,9 +61,11 @@
         }
         #result {
             margin-top: 20px;
-            font-size: 1.3em;
+            padding: 10px;
+            font-size: 1.2em;
             font-weight: bold;
             text-align: center;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -73,7 +75,7 @@
         <h1>あるなしクイズ</h1>
         <div class="question">
             <h2>問題</h2>
-            <p class="question-word">「ある」と「ない」の法則を見つけてください。<br>では、<strong>「ミルク」</strong>は「ある」「ない」のどちらでしょう？</p>
+            <p class="question-word">「ある」と「ない」の法則を見つけてください。<br>では、<strong>「りんご」</strong>は「ある」「ない」のどちらでしょう？</p>
             <table>
                 <tr>
                     <th>ある</th>
@@ -81,11 +83,15 @@
                 </tr>
                 <tr>
                     <td>イルカ</td>
-                    <td>クジラ</td>
+                    <td>ラッコ</td>
                 </tr>
                 <tr>
                     <td>くすり</td>
-                    <td>ドラマ</td>
+                    <td>やかん</td>
+                </tr>
+                <tr>
+                    <td>ミルク</td>
+                    <td>カクテル</td>
                 </tr>
             </table>
         </div>
@@ -101,14 +107,14 @@
     <script>
         function checkAnswer(userAnswer) {
             // 正解
-            const correctAnswer = "ある";
+            const correctAnswer = "ない";
 
             // 結果を表示する要素を取得
             const resultDiv = document.getElementById('result');
 
             // 答えを判定
             if (userAnswer === correctAnswer) {
-                resultDiv.innerHTML = "<p style='color: red;'>🎉 正解！ 🎉</p><p>「ある」の言葉は、逆から読むと別の言葉になるんだ！<br>ミルク → クルミ</p>";
+                resultDiv.innerHTML = "<p style='color: red;'>🎉 正解！ 🎉</p><p style='font-weight:normal; font-size: 1rem;'>「ある」の言葉は、逆から読むと別の言葉になるんだ！<br>（例：イルカ → カルイ）<br>「りんご」は逆から読んでも言葉にならないから「ない」が正解だよ。</p>";
             } else {
                 resultDiv.innerHTML = "<p style='color: blue;'>残念！もう一度考えてみよう。</p>";
             }
