@@ -3,83 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>あるなしクイズ</title>
+    <title>反転世界のコトバ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --background-color: #2E334D; /* 暗い紫がかった背景 */
+            --container-bg: #454A65;   /* 少し明るいコンテナ背景 */
+            --text-color: #EFEFEF;       /* オフホワイトのテキスト */
+            --accent-color: #95F974;     /* 明るい緑のアクセント */
+            --border-color: #1b1e2e;     /* 暗い境界線 */
+        }
         body {
-            font-family: sans-serif;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 0 15px;
-            background-color: #f9f9f9;
+            background-color: var(--background-color);
+            font-family: 'DotGothic16', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            text-shadow: 1px 1px var(--border-color); /* 文字に少し影をつけて読みやすく */
         }
         .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--container-bg);
+            max-width: 500px;
+            margin: 10px auto;
+            padding: 15px 20px;
+            border: 3px solid var(--border-color);
+            box-shadow: inset 0 0 0 3px #606786; /* 内側の枠線で立体感を出す */
         }
-        h1, h2 {
+        h1 {
+            font-size: 1.5rem; /* スマホ向けに調整 */
             text-align: center;
-            color: #333;
+            color: var(--accent-color);
+            margin-bottom: 25px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 15px 0;
         }
         th, td {
-            border: 1px solid #ccc;
-            padding: 12px;
+            border: 2px solid var(--border-color);
+            padding: 8px;
             text-align: center;
-            font-size: 1.2em;
+            font-size: 1.1rem;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #3b4058;
+            color: var(--accent-color);
+            font-size: 1rem;
         }
-        .question-word {
+        .final-question {
             text-align: center;
-            font-size: 1.2em;
-            margin: 20px 0;
+            font-size: 1.3rem;
+            margin: 25px 0;
+            color: #FFD700;
         }
         .answer-area {
-            text-align: center;
-            margin-top: 30px;
+            display: flex; /* ボタンを横並びに */
+            justify-content: center; /* 中央寄せ */
+            gap: 20px; /* ボタン間のスペース */
+            margin-top: 25px;
         }
         button {
-            padding: 10px 20px;
-            font-size: 1.1em;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            background-color: var(--container-bg);
+            border-style: solid;
+            border-width: 3px;
+            border-color: #606786 #1b1e2e #1b1e2e #606786;
+            padding: 8px 16px;
             cursor: pointer;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-            margin: 0 10px;
-            width: 100px;
+            width: 120px;
         }
-        button:hover {
-            opacity: 0.9;
+        button:active {
+            border-color: #1b1e2e #606786 #606786 #1b1e2e; /* 押したときの凹み表現 */
         }
         #result {
             margin-top: 20px;
             padding: 10px;
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: normal;
             text-align: center;
             line-height: 1.6;
+            border: 2px dashed var(--accent-color);
+            min-height: 50px;
+        }
+        #result p {
+            margin: 5px 0;
+        }
+        .result-correct {
+            color: #FFD700; /* 正解は黄色 */
+        }
+        .result-incorrect {
+            color: #FF7F7F; /* 不正解は赤色 */
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>あるなしクイズ</h1>
+        <h1>反転世界のコトバ</h1>
         <div class="question">
-            <h2>問題</h2>
-            <p class="question-word">「ある」と「ない」の法則を見つけてください。<br>では、<strong>「りんご」</strong>は「ある」「ない」のどちらでしょう？</p>
             <table>
                 <tr>
-                    <th>ある</th>
-                    <th>ない</th>
+                    <th>世界A</th>
+                    <th>世界B</th>
                 </tr>
                 <tr>
                     <td>イルカ</td>
@@ -94,11 +124,12 @@
                     <td>カクテル</td>
                 </tr>
             </table>
+            <p class="final-question">りんごは A or B？</p>
         </div>
 
         <div class="answer-area">
-            <button onclick="checkAnswer('ある')">ある</button>
-            <button onclick="checkAnswer('ない')">ない</button>
+            <button onclick="checkAnswer('A')">A</button>
+            <button onclick="checkAnswer('B')">B</button>
         </div>
 
         <div id="result"></div>
@@ -106,17 +137,14 @@
 
     <script>
         function checkAnswer(userAnswer) {
-            // 正解
-            const correctAnswer = "ない";
-
-            // 結果を表示する要素を取得
+            // 正解は「B」
+            const correctAnswer = "B";
             const resultDiv = document.getElementById('result');
 
-            // 答えを判定
             if (userAnswer === correctAnswer) {
-                resultDiv.innerHTML = "<p style='color: red;'>🎉 正解！ 🎉</p><p style='font-weight:normal; font-size: 1rem;'>「ある」の言葉は、逆から読むと別の言葉になるんだ！<br>（例：イルカ → カルイ）<br>「りんご」は逆から読んでも言葉にならないから「ない」が正解だよ。</p>";
+                resultDiv.innerHTML = "<p class='result-correct'>＞＞ 正解！ ＜＜</p><p>「世界A」のコトバは、逆から読むと別の意味を成す。<br>（例：イルカ → カルイ）<br>「りんご」は法則に当てはまらないため「B」が正解だ。</p>";
             } else {
-                resultDiv.innerHTML = "<p style='color: blue;'>残念！もう一度考えてみよう。</p>";
+                resultDiv.innerHTML = "<p class='result-incorrect'>＞＞ 不正解... ＜＜</p><p>世界の法則をもう一度読み解いてみよう。</p>";
             }
         }
     </script>
