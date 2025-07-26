@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>あるなしクイズ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .question-word {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .answer-area {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            margin: 0 10px;
+            width: 100px;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>あるなしクイズ</h1>
+        <div class="question">
+            <h2>問題</h2>
+            <p class="question-word">「ある」と「ない」の法則を見つけてください。<br>では、<strong>「ミルク」</strong>は「ある」「ない」のどちらでしょう？</p>
+            <table>
+                <tr>
+                    <th>ある</th>
+                    <th>ない</th>
+                </tr>
+                <tr>
+                    <td>イルカ</td>
+                    <td>クジラ</td>
+                </tr>
+                <tr>
+                    <td>くすり</td>
+                    <td>ドラマ</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="answer-area">
+            <button onclick="checkAnswer('ある')">ある</button>
+            <button onclick="checkAnswer('ない')">ない</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function checkAnswer(userAnswer) {
+            // 正解
+            const correctAnswer = "ある";
+
+            // 結果を表示する要素を取得
+            const resultDiv = document.getElementById('result');
+
+            // 答えを判定
+            if (userAnswer === correctAnswer) {
+                resultDiv.innerHTML = "<p style='color: red;'>🎉 正解！ 🎉</p><p>「ある」の言葉は、逆から読むと別の言葉になるんだ！<br>ミルク → クルミ</p>";
+            } else {
+                resultDiv.innerHTML = "<p style='color: blue;'>残念！もう一度考えてみよう。</p>";
+            }
+        }
+    </script>
+
+</body>
+</html>
