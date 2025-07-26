@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>反転世界のコトバ</title>
+    <title>お試し謎解き</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background-color: #2E334D; /* 暗い紫がかった背景 */
-            --container-bg: #454A65;   /* 少し明るいコンテナ背景 */
-            --text-color: #EFEFEF;       /* オフホワイトのテキスト */
-            --accent-color: #95F974;     /* 明るい緑のアクセント */
-            --border-color: #1b1e2e;     /* 暗い境界線 */
+            --background-color: #2E334D;
+            --container-bg: #454A65;
+            --text-color: #EFEFEF;
+            --accent-color: #95F974;
+            --border-color: #1b1e2e;
         }
         body {
             background-color: var(--background-color);
@@ -21,7 +21,7 @@
             color: var(--text-color);
             margin: 0;
             padding: 15px;
-            text-shadow: 1px 1px var(--border-color); /* 文字に少し影をつけて読みやすく */
+            text-shadow: 1px 1px var(--border-color);
         }
         .container {
             background-color: var(--container-bg);
@@ -29,10 +29,10 @@
             margin: 10px auto;
             padding: 15px 20px;
             border: 3px solid var(--border-color);
-            box-shadow: inset 0 0 0 3px #606786; /* 内側の枠線で立体感を出す */
+            box-shadow: inset 0 0 0 3px #606786;
         }
         h1 {
-            font-size: 1.5rem; /* スマホ向けに調整 */
+            font-size: 1.5rem;
             text-align: center;
             color: var(--accent-color);
             margin-bottom: 25px;
@@ -60,9 +60,9 @@
             color: #FFD700;
         }
         .answer-area {
-            display: flex; /* ボタンを横並びに */
-            justify-content: center; /* 中央寄せ */
-            gap: 20px; /* ボタン間のスペース */
+            display: flex;
+            justify-content: center;
+            gap: 20px;
             margin-top: 25px;
         }
         button {
@@ -78,38 +78,35 @@
             width: 120px;
         }
         button:active {
-            border-color: #1b1e2e #606786 #606786 #1b1e2e; /* 押したときの凹み表現 */
+            border-color: #1b1e2e #606786 #606786 #1b1e2e;
         }
         #result {
             margin-top: 20px;
             padding: 10px;
-            font-size: 1rem;
+            font-size: 1.2rem;
             font-weight: normal;
             text-align: center;
             line-height: 1.6;
             border: 2px dashed var(--accent-color);
             min-height: 50px;
         }
-        #result p {
-            margin: 5px 0;
-        }
         .result-correct {
-            color: #FFD700; /* 正解は黄色 */
+            color: #FFD700;
         }
         .result-incorrect {
-            color: #FF7F7F; /* 不正解は赤色 */
+            color: #FF7F7F;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>反転世界のコトバ</h1>
+        <h1>お試し謎解き</h1>
         <div class="question">
             <table>
                 <tr>
-                    <th>世界A</th>
-                    <th>世界B</th>
+                    <th>A</th>
+                    <th>B</th>
                 </tr>
                 <tr>
                     <td>イルカ</td>
@@ -127,7 +124,7 @@
             <p class="final-question">りんごは A or B？</p>
         </div>
 
-        <div class="answer-area">
+        <div class="answer-area" id="answer-buttons">
             <button onclick="checkAnswer('A')">A</button>
             <button onclick="checkAnswer('B')">B</button>
         </div>
@@ -137,15 +134,17 @@
 
     <script>
         function checkAnswer(userAnswer) {
-            // 正解は「B」
             const correctAnswer = "B";
             const resultDiv = document.getElementById('result');
 
             if (userAnswer === correctAnswer) {
-                resultDiv.innerHTML = "<p class='result-correct'>＞＞ 正解！ ＜＜</p><p>「世界A」のコトバは、逆から読むと別の意味を成す。<br>（例：イルカ → カルイ）<br>「りんご」は法則に当てはまらないため「B」が正解だ。</p>";
+                resultDiv.innerHTML = "<p class='result-correct'>＞＞ 正解！ ＜＜</p>";
             } else {
-                resultDiv.innerHTML = "<p class='result-incorrect'>＞＞ 不正解... ＜＜</p><p>世界の法則をもう一度読み解いてみよう。</p>";
+                resultDiv.innerHTML = "<p class='result-incorrect'>＞＞ 不正解... ＜＜</p>";
             }
+
+            // 回答の選択肢を非表示にする
+            document.getElementById('answer-buttons').style.display = 'none';
         }
     </script>
 
